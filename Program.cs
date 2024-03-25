@@ -1,6 +1,7 @@
 using CatalogAPI.DAL;
 using CatalogAPI.DAL.Interfaces;
 using CatalogAPI.DTO;
+using CatalogAPI.DTO.Product;
 using CatalogAPI.Models;
 using CatalogServices;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICategory, CategoryDapper>();
+builder.Services.AddScoped<IProduct, ProductDapper>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -31,7 +33,7 @@ builder.Services.AddSwaggerGen(options =>
             License = new OpenApiLicense
             {
                 Name = "Wayan Berdyanto",
-                Url = new Uri("https://github.com/WayanBerdyanto/Eclass")
+                Url = new Uri("https://github.com/WayanBerdyanto/72210481_UTS")
             }
         }
     );
@@ -47,7 +49,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.MapGet("/api/getAllCategory", (ICategory categoryDal) =>
 {
     List<CategoryDTO> categoriesDto = new List<CategoryDTO>();
@@ -64,7 +65,7 @@ app.MapGet("/api/getAllCategory", (ICategory categoryDal) =>
             CategoryName = category.CategoryName
         });
     }
-    return Results.Ok(categoriesDto);
+    return Results.Ok(new { success = true, message = "request update successful", data = categoriesDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getCategoryById/{id}", (ICategory categoryDal, int id) =>
@@ -77,7 +78,7 @@ app.MapGet("/api/getCategoryById/{id}", (ICategory categoryDal, int id) =>
     }
     categoryDto.CategoryID = category.CategoryID;
     categoryDto.CategoryName = category.CategoryName;
-    return Results.Ok(categoryDto);
+    return Results.Ok(new { success = true, message = "request update successful", data = categoryDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getCategory/search/{categoryName}", (ICategory categoryDal, string name) =>
@@ -97,7 +98,7 @@ app.MapGet("/api/getCategory/search/{categoryName}", (ICategory categoryDal, str
             CategoryName = category.CategoryName
         });
     }
-    return Results.Ok(categoriesDto);
+    return Results.Ok(new { success = true, message = "request successful", data = categoriesDto });
 });
 
 app.MapPost("/api/category", (ICategory categoryDal, CategoryCreateDto categoryCreateDto) =>
@@ -111,7 +112,7 @@ app.MapPost("/api/category", (ICategory categoryDal, CategoryCreateDto categoryC
         categoryDal.Insert(category);
 
         //return 201 Created
-        return Results.Created($"/api/categories/{category.CategoryID}", category);
+        return Results.Created($"/api/category/{category.CategoryID}", category);
     }
     catch (Exception ex)
     {
@@ -129,7 +130,7 @@ app.MapPut("/api/category", (ICategory categoryDal, CategoryUpdateDto categoryUp
             CategoryName = categoryUpdateDto.CategoryName
         };
         categoryDal.Update(category);
-        return Results.Ok(new { success = true, message = "Data Berhasil Di Update" });
+        return Results.Ok(new { success = true, message = "request update successful", data = category });
     }
     catch (Exception ex)
     {
@@ -142,8 +143,94 @@ app.MapDelete("/api/category/{id}", (ICategory categoryDal, int id) =>
     try
     {
         categoryDal.Delete(id);
-        return Results.Ok(new { success = true, message = "Data Berhasil Di hapus" });
+        return Results.Ok(new { success = true, message = "request delete successful" });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+});
+// Product API
+app.MapGet("/api/getAllProduct", (IProduct product) =>
+{
+    List<ProductDto> productDto = new List<ProductDto>();
+    var products = product.GetAll();
+    if (!products.Any())
+    {
+        return Results.NotFound(new { error = true, message = "Data Kosong" });
+    }
+    foreach (var data in products)
+    {
+        productDto.Add(new ProductDto
+        {
+            ProductID = data.ProductID,
+            CategoryID = data.CategoryID,
+            Name = data.Name,
+            Description = data.Description,
+            Price = data.Price,
+            Quantity = data.Quantity,
+        });
+    }
+    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+}).WithOpenApi();
 
+app.MapGet("/api/getProductById/{id}", (IProduct products, int id) =>
+{
+    ProductDto productDto = new ProductDto();
+    var product = products.GetByID(id);
+    if (product == null)
+    {
+        return Results.NotFound(new { error = true, message = "Id Tidak Ditemukan" });
+    }
+    productDto.ProductID = product.ProductID;
+    productDto.CategoryID = product.CategoryID;
+    productDto.Name = product.Name;
+    productDto.Description = product.Description;
+    productDto.Price = product.Price;
+    productDto.Quantity = product.Quantity;
+    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+}).WithOpenApi();
+
+app.MapGet("/api/getProduct/search/{name}", (IProduct products, string name) =>
+{
+    List<ProductDto> productDto = new List<ProductDto>();
+    var product = products.GetByName(name);
+    if (!product.Any())
+    {
+        return Results.NotFound(new { error = true, message = "Nama Tidak Ditemukan" });
+    }
+    foreach (var data in product)
+    {
+        productDto.Add(new ProductDto
+        {
+            ProductID = data.ProductID,
+            CategoryID = data.CategoryID,
+            Name = data.Name,
+            Description = data.Description,
+            Price = data.Price,
+            Quantity = data.Quantity,
+        });
+    }
+    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+}).WithOpenApi();
+
+
+app.MapPost("/api/product", (IProduct productDal, CreateProductDto productDto) =>
+{
+    try
+    {
+        Product product = new Product
+        {
+            CategoryID = productDto.CategoryID,
+            Name = productDto.Name,
+            Description = productDto.Description,
+            Price = productDto.Price,
+            Quantity = productDto.Quantity,
+        };
+        productDal.Insert(product);
+
+        //return 201 Created
+        return Results.Created($"/api/product/{product.CategoryID}", product);
     }
     catch (Exception ex)
     {
@@ -151,8 +238,8 @@ app.MapDelete("/api/category/{id}", (ICategory categoryDal, int id) =>
     }
 });
 
-app.Run();
 
+app.Run();
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);

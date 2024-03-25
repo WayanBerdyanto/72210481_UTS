@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using CatalogAPI.DAL;
 using CatalogAPI.DAL.Interfaces;
 using CatalogAPI.Models;
 using Dapper;
@@ -8,19 +9,17 @@ namespace CatalogServices;
 public class CategoryDapper : ICategory
 {
     private readonly IConfiguration _config;
+    private readonly Connection _conn;
+
     public CategoryDapper(IConfiguration config)
     {
         _config = config;
-    }
+        _conn = new Connection(_config);
 
-    private string GetConnectionString()
-    {
-        return _config.GetConnectionString("DefaultConnection");
     }
-
     public IEnumerable<Category> GetAll()
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"SELECT * FROM Categories order by CategoryName";
             var categories = conn.Query<Category>(strSql);
@@ -30,17 +29,13 @@ public class CategoryDapper : ICategory
 
     public Category GetByID(int id)
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"SELECT * FROM Categories WHERE CategoryID = @CategoryID";
             var param = new { CategoryID = id };
             try
             {
                 var category = conn.QueryFirstOrDefault<Category>(strSql, param);
-                if (category == null)
-                {
-                    throw new ArgumentException("Data tidak ditemukan");
-                }
                 return category;
             }
             catch (SqlException sqlEx)
@@ -56,7 +51,7 @@ public class CategoryDapper : ICategory
 
     public IEnumerable<Category> GetByName(string name)
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"SELECT * FROM Categories
                             WHERE CategoryName LIKE @CategoryName";
@@ -79,7 +74,7 @@ public class CategoryDapper : ICategory
 
     public void Insert(Category obj)
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"INSERT INTO Categories (CategoryName) VALUES (@CategoryName)";
             var param = new { CategoryName = obj.CategoryName };
@@ -100,7 +95,7 @@ public class CategoryDapper : ICategory
 
     public void Update(Category obj)
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"UPDATE Categories SET CategoryName = @CategoryName 
                             WHERE CategoryID = @CategoryID";
@@ -127,7 +122,7 @@ public class CategoryDapper : ICategory
 
     public void Delete(int id)
     {
-        using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+        using (SqlConnection conn = _conn.GetConnectDb())
         {
             var strSql = @"DELETE FROM Categories WHERE CategoryID = @CategoryID";
             var param = new { CategoryID = id };

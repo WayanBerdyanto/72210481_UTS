@@ -38,3 +38,4 @@ D:\..SEMESTER 6\DESAIN ARSITEKTUR MICROSERVICES\CatalogAPI\CatalogAPI\obj\Debug\
 D:\..SEMESTER 6\DESAIN ARSITEKTUR MICROSERVICES\CatalogAPI\CatalogAPI\obj\Debug\net8.0\CatalogAPI.genruntimeconfig.cache
 D:\..SEMESTER 6\DESAIN ARSITEKTUR MICROSERVICES\CatalogAPI\CatalogAPI\obj\Debug\net8.0\ref\CatalogAPI.dll
 D:\..SEMESTER 6\DESAIN ARSITEKTUR MICROSERVICES\CatalogAPI\CatalogAPI\bin\Debug\net8.0\Dapper.dll
+D:\..SEMESTER 6\DESAIN ARSITEKTUR MICROSERVICES\CatalogAPI\CatalogAPI\obj\Debug\net8.0\CatalogAPI.sourcelink.json
