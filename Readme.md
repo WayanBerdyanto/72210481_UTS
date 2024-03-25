@@ -134,7 +134,7 @@ dotnet watch run
 ## Endpoint DeleteCategory
 
 - **URL:** `http://localhost:5222/api/category`
-- **Method:** PUT
+- **Method:** DELETE
 
 ## Example Input
 ```json
