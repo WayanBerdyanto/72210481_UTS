@@ -116,11 +116,62 @@ namespace CatalogAPI.DAL
 
         public void Update(Product obj)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = _conn.GetConnectDb())
+            {
+                var strSql = @"UPDATE Products SET CategoryID = @CategoryID, Name = @Name, Description = @Description, Price = @Price, Quantity = @Quantity WHERE ProductID = @ProductID";
+                var param = new
+                {
+                    obj.ProductID,
+                    obj.CategoryID,
+                    obj.Name,
+                    obj.Description,
+                    obj.Price,
+                    obj.Quantity,
+                };
+                try
+                {
+                    int rowsAffected = conn.Execute(strSql, param);
+                    if (rowsAffected == 0)
+                    {
+                        throw new InvalidOperationException("Tidak ada baris yang di Update.");
+                    }
+                }
+                catch (SqlException sqlEx)
+                {
+                    throw new ArgumentException($"Error: {sqlEx.Message} - {sqlEx.Number}");
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException($"Error: {ex.Message}");
+                }
+            }
         }
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = _conn.GetConnectDb())
+            {
+                var strSql = @"DELETE FROM Products WHERE ProductID = @ProductID";
+                var param = new
+                {
+                    ProductID = id
+                };
+                try
+                {
+                    int rowsAffected = conn.Execute(strSql, param);
+                    if (rowsAffected == 0)
+                    {
+                        throw new InvalidOperationException("Tidak ada baris yang di Hapus.");
+                    }
+                }
+                catch (SqlException sqlEx)
+                {
+                    throw new ArgumentException($"Error: {sqlEx.Message} - {sqlEx.Number}");
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException($"Error: {ex.Message}");
+                }
+            }
         }
     }
 }

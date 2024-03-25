@@ -1,6 +1,6 @@
 using CatalogAPI.DAL;
 using CatalogAPI.DAL.Interfaces;
-using CatalogAPI.DTO;
+using CatalogAPI.DTO.Category;
 using CatalogAPI.DTO.Product;
 using CatalogAPI.Models;
 using CatalogServices;
@@ -231,6 +231,41 @@ app.MapPost("/api/product", (IProduct productDal, CreateProductDto productDto) =
 
         //return 201 Created
         return Results.Created($"/api/product/{product.CategoryID}", product);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+});
+
+app.MapPut("/api/product", (IProduct productDal, ProductDto productDto) =>
+{
+    try
+    {
+        var product = new Product
+        {
+            ProductID = productDto.ProductID,
+            CategoryID = productDto.CategoryID,
+            Name = productDto.Name,
+            Description = productDto.Description,
+            Price = productDto.Price,
+            Quantity = productDto.Quantity,
+        };
+        productDal.Update(product);
+        return Results.Ok(new { success = true, message = "request update successful", data = product });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+});
+
+app.MapDelete("/api/product/{id}", (IProduct productDal, int id) =>
+{
+    try
+    {
+        productDal.Delete(id);
+        return Results.Ok(new { success = true, message = "request delete successful" });
     }
     catch (Exception ex)
     {
