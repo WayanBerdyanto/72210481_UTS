@@ -65,7 +65,7 @@ app.MapGet("/api/getAllCategory", (ICategory categoryDal) =>
             CategoryName = category.CategoryName
         });
     }
-    return Results.Ok(new { success = true, message = "request update successful", data = categoriesDto });
+    return Results.Ok(new { success = true, message = "request data successful", data = categoriesDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getCategoryById/{id}", (ICategory categoryDal, int id) =>
@@ -78,7 +78,7 @@ app.MapGet("/api/getCategoryById/{id}", (ICategory categoryDal, int id) =>
     }
     categoryDto.CategoryID = category.CategoryID;
     categoryDto.CategoryName = category.CategoryName;
-    return Results.Ok(new { success = true, message = "request update successful", data = categoryDto });
+    return Results.Ok(new { success = true, message = "request data successful", data = categoryDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getCategory/search/{categoryName}", (ICategory categoryDal, string name) =>
@@ -171,7 +171,7 @@ app.MapGet("/api/getAllProduct", (IProduct product) =>
             Quantity = data.Quantity,
         });
     }
-    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+    return Results.Ok(new { success = true, message = "request data successful", data = productDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getProductById/{id}", (IProduct products, int id) =>
@@ -188,7 +188,7 @@ app.MapGet("/api/getProductById/{id}", (IProduct products, int id) =>
     productDto.Description = product.Description;
     productDto.Price = product.Price;
     productDto.Quantity = product.Quantity;
-    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+    return Results.Ok(new { success = true, message = "request data successful", data = productDto });
 }).WithOpenApi();
 
 app.MapGet("/api/getProduct/search/{name}", (IProduct products, string name) =>
@@ -211,7 +211,7 @@ app.MapGet("/api/getProduct/search/{name}", (IProduct products, string name) =>
             Quantity = data.Quantity,
         });
     }
-    return Results.Ok(new { success = true, message = "request successful", data = productDto });
+    return Results.Ok(new { success = true, message = "request data successful", data = productDto });
 }).WithOpenApi();
 
 
