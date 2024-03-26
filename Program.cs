@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(options =>
             },
             License = new OpenApiLicense
             {
-                Name = "Wayan Berdyanto",
+                Name = "Github",
                 Url = new Uri("https://github.com/WayanBerdyanto/72210481_UTS")
             }
         }
