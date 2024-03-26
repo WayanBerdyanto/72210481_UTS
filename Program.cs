@@ -1,9 +1,11 @@
 using CatalogAPI.DAL;
 using CatalogAPI.DAL.Interfaces;
+using CatalogAPI.DTO;
 using CatalogAPI.DTO.Category;
 using CatalogAPI.DTO.Product;
 using CatalogAPI.Models;
 using CatalogServices;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICategory, CategoryDapper>();
 builder.Services.AddScoped<IProduct, ProductDapper>();
+
+builder.Services.AddScoped<IJoinTable, DetailDapper>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -272,6 +276,52 @@ app.MapDelete("/api/product/{id}", (IProduct productDal, int id) =>
         return Results.BadRequest(ex.Message);
     }
 });
+
+app.MapGet("/api/detailsProduct/", (IJoinTable detail) =>
+{
+    List<DetailDto> detailsDto = new List<DetailDto>();
+
+    var details = detail.GetDetailProducts();
+
+    if (!details.Any())
+    {
+        return Results.NotFound(new { error = true, message = "Data Kosong" });
+    }
+    foreach (var data in details)
+    {
+        detailsDto.Add(new DetailDto
+        {
+            Name = data.Name,
+            Description = data.Description,
+            Price = data.Price,
+            Quantity = data.Quantity,
+            CategoryName = data.CategoryName,
+        });
+    }
+    return Results.Ok(new { success = true, message = "request data successful", data = detailsDto });
+}).WithOpenApi();
+
+app.MapGet("/api/getDetailProduct/search/{productName}", (IJoinTable details, string name) =>
+{
+    List<DetailDto> detailDto = new List<DetailDto>();
+    var product = details.GetByName(name);
+    if (!product.Any())
+    {
+        return Results.NotFound(new { error = true, message = "Nama Tidak Ditemukan" });
+    }
+    foreach (var data in product)
+    {
+        detailDto.Add(new DetailDto
+        {
+            Name = data.Name,
+            Description = data.Description,
+            Price = data.Price,
+            Quantity = data.Quantity,
+            CategoryName = data.CategoryName,
+        });
+    }
+    return Results.Ok(new { success = true, message = "request data successful", data = detailDto });
+}).WithOpenApi();
 
 
 app.Run();
